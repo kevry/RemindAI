@@ -1,0 +1,172 @@
+/* .container{
+    font-family: 'Montserrat', sans-serif;
+    background-color: white;
+}
+
+.header{
+    color: black;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.header h4{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0px;
+}
+
+.header p {
+    font-size: 16px;
+    margin: 0px;
+}
+
+
+.settings {
+    width: 50%;
+    text-align: center;
+    background-color: white;
+}
+
+.settings p, label {
+    font-size: 15px;
+    margin: 0px;
+}
+
+.settings p{
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.settings input[type="number"]{
+    width: 5px;
+    padding: 0px;
+    text-align: center;
+    margin-top: 1px;
+    min-width: 7em;
+    height: 37px;
+    padding: 0px 10px;
+    font-size: 16px;
+    background-color: #f3f3f3;
+    border: 0;
+    border-radius: 4px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+    transition: all 250ms ease-in-out;
+}
+
+.user-interaction {
+    display: flex;
+    margin: 30px;
+    justify-content: center;
+    background-color: white;
+}
+
+.webCam-section {
+    text-align: center;
+    width: 50%;
+    background-color: white;
+}
+
+.webcamButton {
+    background-color: darkorange;
+    color: white;
+    border: none;
+    font-weight: 800;
+    padding: 15px 25px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 20%;
+    cursor: pointer;
+    border-radius: 0.4rem;
+}
+
+.webcamButton:hover {
+    background-color: #6d76f7;
+    color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease-out;
+}
+
+.webcamContainer {
+    background-color: white;
+}
+
+.checkbox-row{
+    display: flex;
+    margin: 10px;
+    justify-content: center;
+}
+
+.label-div{
+    text-align: right;
+    margin: 0px 10px;
+    width: 100px;
+}
+
+.input-div{
+    text-align: left;
+    margin: 0px 10px;
+}
+
+
+.checkB{
+    text-align: center;
+}
+
+.checkL{
+    text-align: center;
+}
+
+
+.button-start {
+    background: rgb(0, 121, 0);
+    color: white;
+    border: none;
+    font-weight: 800;
+    padding: 3px 60px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+}
+
+.button-start:hover {
+    background-color: #6d76f7;
+    color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease-out;
+}
+
+.button-end {
+    background-color: red;
+    color: white;
+    border: none;
+    font-weight: 800;
+    padding: 3px 60px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+}
+
+.button-end:hover {
+    background-color: #6d76f7;
+    color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease-out;
+}
+
+.startButton {
+    text-align: center;
+}
+
+.error-message{
+    text-align: center;
+    color: rgb(240, 0, 0);
+    margin-top: 30px;
+} */

@@ -1,0 +1,56 @@
+.signin-form{
+    text-align: center;
+    margin: 30px;
+    margin-top: 50px;
+  }
+  
+.signin-form h4{
+font-size: 60px;
+margin: 30px;
+margin-bottom: 0px;
+font-weight: 800;
+}
+  
+.signin-form p{
+font-size: 18px;
+margin-bottom: 30px;
+}
+
+.signin-form input{
+width: 5px;
+padding: 0px;
+text-align: center;
+margin-top: 1px;
+min-width: 18em;
+height: 37px;
+padding: 0px 10px;
+font-size: 16px;
+background-color: #f3f3f3;
+border: 0;
+border-radius: 4px;
+margin-left: 10px;
+margin-bottom: 20px;
+transition: all 250ms ease-in-out;
+}
+  
+  
+.login-button{
+background: rgb(0, 121, 0);
+color: white;
+border: none;
+font-weight: 800;
+padding: 3px 60px;
+text-decoration: none;
+display: inline-block;
+font-size: 18px;
+cursor: pointer;
+border-radius: 0.4rem;
+margin-bottom: 20px;
+}
+
+.login-button:hover {
+background-color: #6d76f7;
+color: white;
+border-radius: 4px;
+transition: all 0.3s ease-out;
+}
