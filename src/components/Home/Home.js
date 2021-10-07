@@ -1,16 +1,83 @@
 import React from 'react';
-
-import {NotificationContainer, NotificationManager} from 'react-notifications';
-import app from "../../base"
 import Webcam from "react-webcam";
 import ding from "../../ding.mp3"
 import "./Home.css"
-import HomeNavbar from "./HomeNavBar/HomeNavBar"
+import Nav from '../HomeNavbar/HomeNavbar'
+import Footer from '../Footer/Footer'
+import Modal from 'react-modal';
+import {app, db} from "../../base";
+import { AuthContext } from "../../Auth.js";
 
+import Plot from 'react-plotly.js';
 
-const MainScreen = ({history}) => {
+import addNotification from 'react-push-notification';
 
-    var count = 0
+const layout = {
+    title: {
+      text:'Sit/Stand Tracker',
+      font: {
+        family: 'Courier New, monospace',
+        size: 24
+      },
+      xref: 'paper',
+      x: 0.05,
+    },
+    xaxis: {
+      title: {
+        text: 'Time (minutes)',
+        font: {
+          family: 'Courier New, monospace',
+          size: 18,
+          color: '#7f7f7f'
+        }
+      },
+    },
+    yaxis: {
+      title: {
+        text: 'Sit or Stand',
+        font: {
+          family: 'Courier New, monospace',
+          size: 18,
+          color: '#7f7f7f'
+        }
+      }
+    }
+  };
+
+Modal.setAppElement('#root');
+const customStyles = {
+    content : {
+      top                   : '50%',
+      left                  : '50%',
+      right                 : 'auto',
+      bottom                : 'auto',
+      marginRight           : '-50%',
+      transform             : 'translate(-50%, -50%)'
+    }
+  };
+
+const Home = ({}) => {
+
+    //User email
+    const [email, setEmail] =  React.useState('');
+
+    //Section used for Remind A.I. timer
+    const [seconds, setSeconds] =  React.useState(0);
+    const [timer, setTimer] =  React.useState({'h': '00', 'm': '00', 's': '00'});
+    const [isActive, setIsActive] = React.useState(false);
+
+    const [finaltimer, setfinalTimer] =  React.useState({'h': '00', 'm': '00', 's': '00'});
+    const [timeArray, settimeArray] = React.useState([])
+    const [dataArray, setdataArray] = React.useState([])
+    //////////////////////////////
+
+    //sit an stand counters. sitStand array for plot after session ends
+    const [sitCount, setsitCount] = React.useState(0)
+    const [standCount, setstandCount] = React.useState(0)
+    const [sitStandArray, setsitStandArray] = React.useState([])
+
+    //Modal after session ends state
+    const [modalIsOpen,setIsOpen] = React.useState(false);
 
     //WEBCAME STATE
     const [webcamEnabled, setwebCam]= React.useState(false);
@@ -25,10 +92,6 @@ const MainScreen = ({history}) => {
     //STATE OF GAME
     const [currentState, changeState] = React.useState(false)
 
-
-    //INTERVAL STATE
-    const [interval, changeInterval] = React.useState(null);
-
     //STATE OF WIDGET BEING DISABLED
     const [disabledState, changeDisable] = React.useState(false);
 
@@ -36,17 +99,95 @@ const MainScreen = ({history}) => {
     const [errorMessage, changeErrorMessage] = React.useState("");
 
     const webcamRef = React.useRef(null);
-    const [imgSrc, setImgSrc] = React.useState(null);
 
     const AudioSound = document.getElementsByClassName("audio-element")[0]
 
-    var count = 0;
-    var standCount = 0;
+    function toggle() {
+        //Toggling the timer
+        setIsActive(!isActive);
+    }
 
+    function reset() {
+        //reset() used to reset timer
+        setSeconds(0);
+        setIsActive(false);
+    }
+
+    function openModal() {
+        setIsOpen(true);
+    }
+    function closeModal() {
+        setIsOpen(false);
+    }
+
+    React.useEffect(() => {
+        let user = app.auth().currentUser
+        if (user != null)
+            setEmail(String(user.email))
+    })
+
+
+    React.useEffect(() => {
+        let interval = null;
+        if (isActive) {
+          interval = setInterval(intervalTimer, 1000);
+        } else if (!isActive && seconds !== 0) {
+          clearInterval(interval);
+        }
+        return () => clearInterval(interval);
+    }, [isActive, seconds]);
+
+    function secondsToTime(secs){
+        //Used to convert seconds to hrs, mins, and secs
+        let hours = Math.floor(secs / (60 * 60));
+        if (hours <= 9)
+            hours = '0' + String(hours)
+        else 
+            hours= String(hours)
+    
+        let divisor_for_minutes = secs % (60 * 60);
+        let minutes = Math.floor(divisor_for_minutes / 60);
+        if (minutes <= 9)
+            minutes = '0' + String(minutes)
+        else 
+            minutes = String(minutes)
+    
+        let divisor_for_seconds = divisor_for_minutes % 60;
+        let seconds = Math.ceil(divisor_for_seconds);
+        if (seconds <= 9)
+            seconds = '0' + String(seconds)
+        else 
+            seconds = String(seconds)
+    
+        let obj = {
+          "h": hours,
+          "m": minutes,
+          "s": seconds
+        };
+        return obj;
+    }
+
+    //Main function interval.... Called every second
+    function intervalTimer() {
+        let second = seconds + 1;
+        setSeconds(second);
+        setTimer(secondsToTime(second))
+
+        // Run prediction model every 5 seconds
+        if (second % 5 === 0) { 
+           snapshotImage()
+        }
+    }
+    
 
     //function that enables webcam
     const enableWebcam = () => {
-        setwebCam(true)
+        //Cannot turn off camera during mid-process
+        if (currentState)
+            return
+
+        //Otherwise, take the inverse boolean
+        setwebCam(!webcamEnabled)
     }
 
     //function that will play the audio for alarm
@@ -54,72 +195,78 @@ const MainScreen = ({history}) => {
         AudioSound.play()
     }
 
-
     function getData(obj) {
+        console.log("5 second mark")
 
+        var xhttp= new XMLHttpRequest()
 
-        console.log(standInterval + " sec mark!")
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
 
-        if (alarmChoice){
-            playAudio()
-        }
-        if (notifChoice){
-            console.log("Here")
-            NotificationManager.info('Info message');
-        }
-        // // create a new XMLHttpRequest
-        // var xhr = new XMLHttpRequest()
-        // xhr.addEventListener("load", () =>{
-        //     var result = JSON.parse(xhr.response)
-        //     console.log(result)
-        //     result = result["payload"][0]["displayName"]
+                var response = String(xhttp.responseText)
+                //Changing counts for sit/stand
+                if (response === "Sitting"){
+                    setsitCount(sitCount + 1)
+                    setstandCount(0)
+                    var temp = sitStandArray
+                    temp.push(0)
+                    setsitStandArray(temp)
+                } else if (response === "Standing"){
+                    setstandCount(standCount + 1)
+                    setsitCount(0)
+                    var temp = sitStandArray
+                    temp.push(1)
+                    setsitStandArray(temp)
+                } else {
+                    console.log("Undetermined response")
+                    setsitCount(0)
+                    setstandCount(0)
+                    var temp = sitStandArray
+                    temp.push(sitStandArray[sitStandArray.length - 1])
+                    setsitStandArray(temp)
+                }
 
-        //     if (result == "sitting"){
-        //     console.log("Sitting")
-        //     console.log(count)
+                // Typical action to be performed when the document is ready:
+                console.log('sitCount: ' + String(sitCount))
+                console.log('standCount: ' + String(standCount))
 
-        //     count = count + 1
-        //     } else {
-        //         console.log("Standing")
-        //         console.log(count)
+                // sitCount is multiple of 5. Ex sitCount = 2 means time is 10 secs
+                // If interval is 15 sec, 15/5 is 3.
+                // Once sitCount reaches interval or more, sound alarm
+                if (sitCount >= standInterval/5){
 
-        //         //User has stood for a period of time after alarm
-        //         if (standCount >= 5 && warnStatus){
-        //             standCount = 0
-        //             count = 0
-        //             changeWarn(false)
-        //         }
+                    if (alarmChoice){
+                        playAudio()
+                    }
 
-        //         if (warnStatus){
-        //             standCount = standCount + 1
-        //         }
-        //         else{
-        //             standCount = 0
-        //             count = 0
-        //         }
-        //     }
-        //     // count has exceeded limit
-        //     if (count >= 5) {
-        //     changeWarn(true)
-        //     if (alarmChoice){
-        //         playAudio()
-        //     }
-        //     if (notifChoice){
-        //         NotificationManager.warning('Warning message', 'Time to get Up!', 5000);
-        //     }
-        //     }
-        // });
-        // xhr.open("POST", "https://automl.googleapis.com/v1beta1/projects/594510151459/locations/us-central1/models/ICN6904213941828714496:predict");
-        // xhr.setRequestHeader('Authorization', 'Bearer ' + "ya29.c.Kp0B5QfKfN9j3s5OCIWx1p_-8iaTpMmYnw_0SxIMUA2vaaoLtH8kHCqjFHOUct8zm7FP9wfTguY11s_Z47eSSwo2R_bzASSr2ZR3CVzZms8unHPg9xzfSutKiIMpPJtRoI4rfs26FXuljIor8cSDeAgX9Fv4DFwcSQuNdXb3tU8gM2d7VTYWih-Pnq1X_aPxoLmjcq9aa3dLuGwNQSBkFA");
-        // xhr.setRequestHeader("Content-Type", "application/json");
-        // xhr.send(JSON.stringify({"payload": {"image": {"imageBytes": obj}}}));   
+                    if (notifChoice){
+                        addNotification({
+                            title: 'TIME TO STAND UP',
+                            subtitle: 'Remind A.I.',
+                            message: 'Take a break for a few seconds',
+                            theme: 'darkblue',
+                            native: true
+                        });
+                    }
+                }
+            }
+        };
+
+        xhttp.open("POST", "http://127.0.0.1:5000/");
+        xhttp.setRequestHeader("Content-Type", "application/json");
+
+        //data to be sent to API
+        var sendData = JSON.stringify(
+            {"payload": 
+                {"image": 
+                    {"imageBytes": obj}
+                }
+            })
+        xhttp.send(sendData);  
     }
 
-
-
-
+    //Function used to take snapshot
     const snapshotImage = () => {
-
         if (webcamRef.current != null) {
 
             //GETTING CURRENT SNAPSHOT FROM CAMERA
@@ -128,17 +275,19 @@ const MainScreen = ({history}) => {
             //CONVERTING TO STRING
             var parseSrc = String(imageSrc)
 
-            //PARSING NECESSARY CONTENTS OF parseSrc
+            // //PARSING NECESSARY CONTENTS OF parseSrc
             var newImageScr = parseSrc.substr(parseSrc.indexOf(",") + 1)
         
             getData(newImageScr)
         }
     }
 
+    //Setting the sitting limit
     const handleChange = (e) => {
-        setStandInterval(e.target.value);
+        setStandInterval(e.target.value * 60);
     }
 
+    //Alamr checkbox for user
     const alarmChange = (e) => {
         if (e.target.value === "on")
             setAlarm(true);
@@ -146,14 +295,16 @@ const MainScreen = ({history}) => {
             setAlarm(false);
     }
 
+    //Notification checkbox for user 
     const notificationChange = (e) => {
-        setNotif(!notifChoice)
+        if (e.target.value === "on")
+        setNotif(true);
+    else
+        setNotif(false);
     }
-
 
     const errorCheck = () =>{
         var error_message = "Error occured: "
-
         //CHECKING IF WEBCAM IS ON
         if (!webcamEnabled){
             error_message += " Enable webcam"
@@ -166,8 +317,8 @@ const MainScreen = ({history}) => {
             error_message += " Please enter an interval"
             changeErrorMessage(error_message)
             return true
-        } else if (standInterval > 100){
-            error_message += " Interval cannot be greater than 100"
+        } else if (standInterval > 1800){
+            error_message += " Interval cannot be greater than 30 minutes"
             changeErrorMessage(error_message)
             return true
 
@@ -184,75 +335,106 @@ const MainScreen = ({history}) => {
             return true
         }
 
-
         error_message = ""
         changeErrorMessage(error_message)
         return false
     }
     
     const capture = () => {
-        //ERROR CHECKING USER INPUT
-        if (errorCheck())
+    //User begins a new session
+        if (errorCheck()) //error checking inputs from user
             return
         //Called when main button is clicked
-        if (!currentState){
-
+        if (!currentState && !isActive){
             //changing the state of game
             changeState(!currentState)
+
+            //Reseting all counts
+            setsitStandArray([])
+            setstandCount(0)
+            setsitCount(0)
 
             //Disabling the settings during the game
             changeDisable(true);
 
-            //Creating an interval
-            if (interval == null){
-                changeInterval(setInterval(snapshotImage, standInterval * 1000)) 
-            }
+            console.log("Started.....")
+            toggle();
         } 
     };
 
-
     const endCapture = () => {
-        if (currentState) {
+    //User clicks end session
+        if (currentState && isActive) {
 
+            let objTimer = timer;
             //changing the state of game
             changeState(!currentState)
-    
             //Enabling the settings again
             changeDisable(false);
-    
-            if (interval != null) {
-                clearInterval(interval)
-                changeInterval(null)
-            }
+
+            //Stopping main interval function
+            toggle();
+            //Reseting clock
+            reset();
+
+            recordResults(objTimer);
         }    
     }
 
-    const logout = () =>{
-        app.auth().signOut()
-    }
 
+    function recordResults(objTimer){
+
+        setfinalTimer(objTimer);
+        console.log(sitStandArray)
+        if (sitStandArray.length > 0){
+            var timearr = []
+            for(var i = 0; i< sitStandArray.length; i++) {
+                timearr.push((i * 5)/60);
+            }
+
+            settimeArray(timearr)
+            setdataArray(sitStandArray)
+
+            openModal()
+
+            console.log("Saving data to firestore...")
+            const userRef = db.collection("users").doc(email).collection('userData').add({
+                'timeSpent': timer,
+                'sitStandArray': sitStandArray,
+                'time': timearr
+              });
+
+        }
+    }
 
     return (
     <>
-    <HomeNavbar />
+        
     <div className="container">
+        <Nav />
 
         <audio className="audio-element">
             <source src={ding}></source>
         </audio>
 
         <div className="header">
-            <h4> Using innovative A.I. technology </h4>
-            <h4> to prevent back-pain and improve physical health while working</h4>
-            <p> Remind A.I. reminds user's to stand when sitting for prolonged periods of time</p>
+            <h4> Welcome! Customize settings to begin </h4>
+            <br></br>
+            <h5> 
+                Time: {' ' + timer.h + 'h' + ' :' + timer.m + 'm' + ' :' + timer.s + 's'}
+            </h5>
         </div>
 
+        <div className="main-body">
 
-        <div className="user-interaction">
+            <div className="user-interaction">
 
-            <div className="webCam-section">
-                {webcamEnabled ? (
-                    <div className="webcamContainer">
+                <div className="webCam-section">
+                    {webcamEnabled ? (
+                        <div className="webcamContainer">
+                            <button className="button-exit-cam" onClick={enableWebcam}>
+                                x
+                            </button>
                             <Webcam
                                 className="webcamFootage"
                                 audio={false}
@@ -262,71 +444,111 @@ const MainScreen = ({history}) => {
                                 width="400"
                                 height="320"
                             />
+                        </div>
+                    ):(
+                        <div className="webcam-button-container">
+                            <button className="webcamButton" type="button" onClick={enableWebcam}>
+                                Enable webcam
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <div className = "settings">
+                    <p> Customize settings to begin</p>
+
+                    <label>Sitting limit (minutes): </label>
+                    <br></br>
+                    <input disabled={disabledState} placeholder= "Enter here" name="standInterval" type="number" min="5" max="60" onChange={handleChange}></input>
+
+                    <br></br>
+                    <label>Alarm and/or notification after limit has been reached: </label>
+                    <br></br> 
+
+                    <div className="checkbox-row">
+                        <div className="label-div">
+                            <label className = "checkL">Alarm: </label>
+                        </div>
+                        
+                        <div className="input-div">
+                            <input disabled={disabledState} className = "checkB" name="alarmSelect" type="checkbox" onChange={alarmChange} />
+                        </div>
+                        
                     </div>
+
+                    <div className="checkbox-row">
+                        <div className="label-div">
+                            <label className = "checkL">Notification: </label>
+                        </div>
+
+                        <div className="input-div">
+                            <input disabled={disabledState} className = "checkB" name="notificationSelect" type="checkbox" onChange={notificationChange}/>
+                        </div>
+                    </div>
+
+                    <div className="error-message">
+                        <p>
+                            {errorMessage}
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div className="startButton" >
+                {!currentState ? (
+                    <button  className="button-start"onClick={capture}>Start</button>
                 ):(
-                    <div className="webcam-buttom-container">
-                        <button className="webcamButton" type="button" onClick={enableWebcam}>
-                            Enable webcam
-                        </button>
-                    </div>
-                )}
+                    <button  className="button-end" onClick={endCapture}>End</button>
+                )}        
             </div>
 
-            <div className = "settings">
-                <p> Customize settings to begin</p>
 
-                <label>Interval for reminder (seconds): </label>
-                <br></br>
-                <input disabled={disabledState} placeholder= "Enter here" name="standInterval" type="number" min="5" max="60" onChange={handleChange}></input>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                style={customStyles}
+                contentLabel="Example Modal"
+            >
 
-                <br></br>
-                <label>Alarm and/or notification after limit has been reached: </label>
-                <br></br> 
+            <h2> Results: </h2>
+            
+            <div>
+                <h4>
+                    Time spent: {' ' + finaltimer.h + ':' + finaltimer.m + ':' + finaltimer.s}
+                </h4>
 
-                <div className="checkbox-row">
-                    <div className="label-div">
-                        <label className = "checkL">Alarm: </label>
-                    </div>
-                    
-                    <div className="input-div">
-                        <input disabled={disabledState} className = "checkB" name="alarmSelect" type="checkbox" onChange={alarmChange} />
-                    </div>
-                    
+                <div>
+                <Plot
+                    data={[
+                    {
+                        x: timeArray,
+                        y: dataArray,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        marker: {color: 'red'},
+                    }]}
+                    layout={ layout }
+                />
                 </div>
-
-                <div className="checkbox-row">
-                    <div className="label-div">
-                        <label className = "checkL">Notification: </label>
-                    </div>
-
-                    <div className="input-div">
-                        <input disabled={disabledState} className = "checkB" name="notificationSelect" type="checkbox" onChange={notificationChange}/>
-                    </div>
-                </div>
-
-                <div className="error-message">
-                    <p>
-                        {errorMessage}
-                    </p>
-                </div>
-
+                <button onClick={closeModal}> Close </button>
             </div>
+
+            </Modal>
+
+
 
         </div>
 
-
-
-
-        <div className="startButton" >
-            {!currentState ? (
-                <button  className="button-start"onClick={capture}>Start</button>
-            ):(
-                <button  className="button-end" onClick={endCapture}>End</button>
-            )}        
+        <div className="footer-location">
+            <Footer/>
         </div>
+    
     </div>
+
     </>
   );
 };
 
-export default MainScreen;
+export default Home;

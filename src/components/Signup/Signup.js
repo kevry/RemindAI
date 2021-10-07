@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { withRouter } from "react-router";
-import app from "../../base"
+import {app} from "../../base"
 import "./Signup.css"
 
 import Navbar from "../Navbar/Navbar"
