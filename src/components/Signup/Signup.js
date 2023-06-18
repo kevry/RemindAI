@@ -8,14 +8,12 @@ import Navbar from "../Navbar/Navbar"
 const SignUp = ({ history }) => {
   const handleSignUp = useCallback(async event => {
     event.preventDefault();
-    const { email, password , rpassword} = event.target.elements;
+    const { email, password, rpassword} = event.target.elements;
 
-    if (password !== rpassword){
+    if (password.value !== rpassword.value){
       alert("Passwords must match")
       return
     }
-
-
 
     try {
       await app
@@ -54,7 +52,7 @@ const SignUp = ({ history }) => {
             </div>
 
             <div className="comp">
-                <input name="rpassword" type="rpassword" placeholder="Repeat Password" />
+                <input name="rpassword" type="password" placeholder="Repeat Password" />
             </div>
           </div>
           <button className = "register-button" type="submit">Sign Up</button>

@@ -1,5 +1,6 @@
 import React from 'react';
 import Webcam from "react-webcam";
+import CryptoJS from "crypto-js"
 import ding from "../../ding.mp3"
 import "./MainScreen.css"
 import Nav from '../Navbar/Navbar'
@@ -20,7 +21,7 @@ const customStyles = {
     }
   };
 
-  const layout = {
+const layout = {
     title: {
       text:'Sit/Stand Tracker',
       font: {
@@ -50,7 +51,9 @@ const customStyles = {
         }
       }
     }
-  };
+    };
+
+const secretKey = 'testkevry10121416192012345678910';
 
 const MainScreen = ({}) => {
 
@@ -250,6 +253,7 @@ const MainScreen = ({}) => {
                     {"imageBytes": obj}
                 }
             })
+
         xhttp.send(sendData);  
     }
 
@@ -263,9 +267,15 @@ const MainScreen = ({}) => {
             //CONVERTING TO STRING
             var parseSrc = String(imageSrc)
 
-            // //PARSING NECESSARY CONTENTS OF parseSrc
+            //PARSING NECESSARY CONTENTS OF parseSrc
             var newImageScr = parseSrc.substr(parseSrc.indexOf(",") + 1)
         
+            // ENCRYPT DATA
+            //console.log(secretKey)
+            //console.log(newImageScr.substr(0,10))
+            //const encrypteddata = CryptoJS.AES.encrypt(newImageScr, secretKey).toString()
+            //console.log(encrypteddata.substr(0,10))
+            //getData(encrypteddata)
             getData(newImageScr)
         }
     }
