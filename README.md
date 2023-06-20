@@ -8,6 +8,10 @@ Remind A.I. is winner of two categories at BostonHacks 2020 🎉🎊
 
 Devpost Link - https://devpost.com/software/remind-a-i
 
+Google Cloud Demo Week Link - https://events.withgoogle.com/demo-week-hackathon-fund/remind-ai/#
+
+Demo Link - https://drive.google.com/file/d/1pKkIDtWujqohYbHvuVvlgWnHKYRE7IbM/view?usp=sharing
+
 ## About:
 Remind A.I. is a web application that will remind users to stand when sitting for prolonged periods of time. With permission, it will utilize your computer/laptop's front-facing camera to track in real-time whether you are sitting or standing. If you are sitting for a user-defined period of time, it will either send a notification or signal an alarm depending on the user's preference.
 
