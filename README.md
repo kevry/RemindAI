@@ -1,76 +1,45 @@
-# Getting Started with Create React App
+# Remind A.I.
+#### Written by Kevin M. Delgado
 
-`cd remindai`
+## Awards:
+Remind A.I. is winner of two categories at BostonHacks 2020 🎉🎊
+1. BostonHacks Best FitTech 💪🏽 
+2. Best Use of Google Cloud - COVID-19 Hackathon Fund 🏋️‍♂️🏃‍♀️
 
-`npm install`
+Devpost Link - https://devpost.com/software/remind-a-i
 
-`npm start`
+Google Cloud Demo Week Link - https://events.withgoogle.com/demo-week-hackathon-fund/remind-ai/#
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Demo Link - https://drive.google.com/file/d/1pKkIDtWujqohYbHvuVvlgWnHKYRE7IbM/view?usp=sharing
 
-## Available Scripts
+## About:
+Remind A.I. is a web application that will remind users to stand when sitting for prolonged periods of time. With permission, it will utilize your computer/laptop's front-facing camera to track in real-time whether you are sitting or standing. If you are sitting for a user-defined period of time, it will either send a notification or signal an alarm depending on the user's preference.
 
-In the project directory, you can run:
+<img width="1423" alt="remindaimainpage" src="https://github.com/kevry/RemindAI/assets/45439265/693bce62-ef48-4823-a970-2a71f4a2ce34">
 
-### `yarn start`
+## Note:
+Project only supports Google Chrome web browser at the moment. More to work on ...
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## How to Use:
+The first thing you will need to do, once on the app, is enable your camera. You'll need to enable access to your front-facing camera. You will only need to do this once. After, you can customize the two features before you can start running a session:
 
-### `yarn test`
+1. The maximum length of time (in minutes) you can sit before you will be notified by Remind A.I. to stand.
+2. Whether you prefer to either receive notice as an alarm or popup notification.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Create an Account:
+On Remind A.I., you can also create an account to keep track of your sit vs. standing activity. This was accomplished through the use of Google Firebase (GCP)
 
-### `yarn build`
+<img width="325" alt="Screen Shot 2023-06-18 at 5 03 37 PM" src="https://github.com/kevry/RemindAI/assets/45439265/c717c776-dddd-4d6e-a116-4abb7b12f759">
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<img width="325" alt="Screen Shot 2023-06-18 at 5 03 51 PM" src="https://github.com/kevry/RemindAI/assets/45439265/1f37a6d8-4385-4c77-8ad3-bea8ace959ff">
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Tracking:
+On your account, you'll be able to view your previous sessions. You'll be able to view time series plots of when you were sitting and standing during your sessions.
 
-### `yarn eject`
+<img width="1200" alt="image" src="https://github.com/kevry/RemindAI/assets/45439265/f40c89d2-0660-452e-abd8-10c4895a2e7a">
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## License:
+Remind A.I. is available under the Apache 2.0 license. View LICENSE file for more information.
